@@ -1,3 +1,5 @@
+import { bg } from 'date-fns/locale/bg'
+
 /** @type {import('tailwindcss').Config} */
 export default {
     darkMode: ["class"],
@@ -13,10 +15,16 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
-  			background: 'hsl(var(--background))',
-  			foreground: 'hsl(var(--foreground))',
-  			card: {
-  				DEFAULT: 'hsl(var(--card))',
+			linkedin : {
+				blue : "#0A66C2",
+				bg : "#F3F2EF"
+			}
+		},
+  		colors: {
+			background: 'hsl(var(--background))',
+			foreground: 'hsl(var(--foreground))',
+			card: {
+				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
   			},
   			popover: {
