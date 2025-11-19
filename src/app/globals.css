@@ -32,7 +32,10 @@
   * {
     @apply border-border;
   }
+  
+  /* Đã sửa đổi ở đây: */
+  /* Thiết lập màu nền xám nhạt #F3F2EF cho body */
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#F3F2EF] text-foreground; 
   }
 }

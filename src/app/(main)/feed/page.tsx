@@ -5,9 +5,7 @@ import { Recommendations } from "@/components/network/recommendation"
 
 export default function FeedPage() {
   return (
-    <div className="min-h-screen bg-[#F3F2EF] font-sans">
-      <Navbar />
-      
+    <div className="min-h-screen bg-[#F3F2EF] font-sans">      
       <main className="container mx-auto max-w-7xl px-0 md:px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Left Sidebar */}
