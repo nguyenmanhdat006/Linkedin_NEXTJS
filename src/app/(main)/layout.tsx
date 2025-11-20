@@ -7,7 +7,6 @@ export default function MainLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-linkedin-bg">
       <Navbar />
       
-      {/* Bỏ hết khoảng cách */}
         <div className="max-w-7xl mx-auto px-4">
           {children}
       </div>
