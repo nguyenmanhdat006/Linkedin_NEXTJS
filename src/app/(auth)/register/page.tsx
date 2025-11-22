@@ -2,18 +2,63 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import AuthFooter from "@/components/auth/AuthFooter";
+import axiosClient from "@/lib/axiosClient";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function RegisterPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await axiosClient.post("/auth/register", {
+        email,
+        password,
+        firstname,
+        lastname,
+      });
+
+      toast.success(
+        "Mã xác nhận đã được gửi tới email của bạn, vui lòng xác nhận"
+      );
+
+      // redirect sang verify với email
+      setTimeout(() => {
+        router.push(`/verify?email=${encodeURIComponent(email)}`);
+      }, 1500);
+    } catch (err: any) {
+      console.error(err);
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data || "Lỗi kết nối server");
+      } else {
+        toast.error("Lỗi không xác định");
+      }
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-[#f3f2ef]">
       {/* Header */}
       <header className="py-8 w-full flex flex-col items-center justify-center">
         <Link href="/home" className="flex items-center justify-center mb-6">
-          <span className="text-[#0a66c2] text-3xl font-bold tracking-tight">Linked</span>
+          <span className="text-[#0a66c2] text-3xl font-bold tracking-tight">
+            Linked
+          </span>
           <div className="bg-[#0a66c2] rounded-sm ml-0.5 w-7 h-7 flex items-center justify-center">
             <span className="text-white font-bold text-xl pb-1">in</span>
           </div>
@@ -27,13 +72,44 @@ export default function RegisterPage() {
       <main className="flex-grow flex justify-center px-4 w-full">
         <div className="w-full max-w-[400px]">
           <div className="bg-white rounded-lg p-8 shadow-sm">
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleRegister}>
+              {/* Firstname */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  First name
+                </label>
+                <input
+                  type="text"
+                  value={firstname}
+                  onChange={(e) => setFirstname(e.target.value)}
+                  className="w-full h-10 px-3 rounded-md border border-gray-300 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition"
+                  required
+                />
+              </div>
+
+              {/* Lastname */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Last name
+                </label>
+                <input
+                  type="text"
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
+                  className="w-full h-10 px-3 rounded-md border border-gray-300 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition"
+                  required
+                />
+              </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full h-10 px-3 rounded-md border border-gray-300 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition"
                   required
                 />
@@ -47,6 +123,8 @@ export default function RegisterPage() {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full h-10 px-3 rounded-md border border-gray-300 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition"
                     required
                   />
@@ -60,54 +138,14 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Agreement text */}
-              <p className="text-xs text-gray-600 leading-relaxed">
-                By clicking Agree & Join or Continue, you agree to the LinkedIn{" "}
-                <Link href="#" className="text-[#0a66c2] hover:underline font-medium">
-                  User Agreement
-                </Link>
-                ,{" "}
-                <Link href="#" className="text-[#0a66c2] hover:underline font-medium">
-                  Privacy Policy
-                </Link>
-                , and{" "}
-                <Link href="#" className="text-[#0a66c2] hover:underline font-medium">
-                  Cookie Policy
-                </Link>
-                .
-              </p>
-
               {/* Agree & Join Button */}
-              <button className="w-full bg-[#0a66c2] hover:bg-[#004182] text-white font-semibold py-3 rounded-full transition-colors">
-                Agree & Join
-              </button>
-
-              {/* Divider "or" */}
-              <div className="flex items-center my-6">
-                <div className="flex-1 border-t border-gray-300"></div>
-                <span className="px-4 text-sm text-gray-600 font-medium">or</span>
-                <div className="flex-1 border-t border-gray-300"></div>
-              </div>
-
-              {/* Nút Continue with Google – chuẩn LinkedIn 2025, không có "Continue as Dat" */}
               <button
-                type="button"
-                className="w-full flex items-center justify-center gap-3 border border-gray-400 rounded-full py-3 px-6 
-                         text-gray-700 font-medium text-base
-                         hover:border-gray-800 hover:shadow-sm 
-                         transition-all duration-200 bg-white"
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#0a66c2] hover:bg-[#004182] text-white font-semibold py-3 rounded-full transition-colors disabled:opacity-50"
               >
-                <FcGoogle size={22} />
-                <span>Continue with Google</span>
+                {loading ? "Processing..." : "Agree & Join"}
               </button>
-
-              {/* Sign in link */}
-              <div className="pt-6 text-center">
-                Already on LinkedIn?{" "}
-                <Link href="/login" className="text-[#0a66c2] font-semibold hover:underline">
-                  Sign in
-                </Link>
-              </div>
             </form>
           </div>
 

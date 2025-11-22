@@ -2,18 +2,59 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import AuthFooter from "@/components/auth/AuthFooter";
+import axiosClient from "@/lib/axiosClient";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await axiosClient.post("/auth/login", {
+        email,
+        password,
+      });
+
+      if (res.data.includes("chưa xác nhận")) {
+        toast.error(res.data);
+      } else {
+        localStorage.setItem("token", res.data);
+        toast.success("Login thành công!");
+        setTimeout(() => {
+          router.push("/feed");
+        }, 1000);
+      }
+    } catch (err: any) {
+      console.error(err);
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data || "Lỗi kết nối server");
+      } else {
+        toast.error("Lỗi không xác định");
+      }
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#f3f2ef] flex flex-col font-sans">
-      {/* Header: Logo nằm chính giữa */}
+      {/* Header */}
       <header className="w-full py-8 flex justify-center">
         <Link href="/home" className="flex items-center">
-          <span className="text-[#0a66c2] text-3xl font-bold tracking-tight">Linked</span>
+          <span className="text-[#0a66c2] text-3xl font-bold tracking-tight">
+            Linked
+          </span>
           <div className="bg-[#0a66c2] rounded-sm ml-0.5 w-7 h-7 flex items-center justify-center">
             <span className="text-white font-bold text-xl pb-1">in</span>
           </div>
@@ -24,28 +65,33 @@ export default function LoginPage() {
       <main className="flex-grow flex justify-center items-start pt-4 px-4">
         <div className="w-full max-w-[400px] space-y-6">
           <div className="bg-white rounded-lg shadow-sm p-8">
-
             <h1 className="text-3xl font-semibold text-black mb-2">Sign in</h1>
             <p className="text-base text-gray-600 mb-6">
               Stay updated on your professional world
             </p>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleLogin}>
               <input
                 type="text"
                 placeholder="Email or phone number"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full h-12 px-3 rounded-md border border-gray-300 text-base
-                         focus:border-black focus:outline-none focus:ring-1 focus:ring-black 
-                         transition placeholder-gray-500"
+                           focus:border-black focus:outline-none focus:ring-1 focus:ring-black 
+                           transition placeholder-gray-500"
+                required
               />
 
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full h-12 px-3 rounded-md border border-gray-300 text-base
-                           focus:border-black focus:outline-none focus:ring-1 focus:ring-black 
-                           transition placeholder-gray-500"
+                             focus:border-black focus:outline-none focus:ring-1 focus:ring-black 
+                             transition placeholder-gray-500"
+                  required
                 />
                 <button
                   type="button"
@@ -56,12 +102,19 @@ export default function LoginPage() {
                 </button>
               </div>
 
-              <Link href="#" className="block text-[#0a66c2] font-semibold text-sm hover:underline">
+              <Link
+                href="#"
+                className="block text-[#0a66c2] font-semibold text-sm hover:underline"
+              >
                 Forgot password?
               </Link>
 
-              <button className="w-full bg-[#0a66c2] hover:bg-[#004182] text-white font-semibold py-3.5 rounded-full transition-colors text-base">
-                Sign in
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#0a66c2] hover:bg-[#004182] text-white font-semibold py-3.5 rounded-full transition-colors text-base disabled:opacity-50"
+              >
+                {loading ? "Signing in..." : "Sign in"}
               </button>
             </form>
 
@@ -71,7 +124,6 @@ export default function LoginPage() {
               <div className="flex-1 border-t border-gray-300"></div>
             </div>
 
-            {/* Google Button */}
             <button
               type="button"
               className="w-full flex items-center justify-center gap-3 border border-gray-400 rounded-full py-3 px-6
@@ -84,10 +136,12 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Join now */}
           <div className="text-center text-base">
             <span className="text-gray-700">New to LinkedIn? </span>
-            <Link href="/register" className="text-[#0a66c2] font-semibold hover:underline">
+            <Link
+              href="/register"
+              className="text-[#0a66c2] font-semibold hover:underline"
+            >
               Join now
             </Link>
           </div>
