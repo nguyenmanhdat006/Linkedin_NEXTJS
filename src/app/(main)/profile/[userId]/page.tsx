@@ -30,9 +30,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const userId = params?.userId; 
+      const userSlug = params?.userId; 
 
-      if (!userId) {
+      if (!userSlug) {
         console.error("Không tìm thấy ID trên URL");
         setLoading(false);
         return;
@@ -40,7 +40,7 @@ export default function ProfilePage() {
 
       try {
         setLoading(true);
-        const res = await profileApi.getProfileByUserId(userId as string);
+        const res = await profileApi.getProfileByUserId(userSlug as string);
         if (res.success) {
           setProfile(res.data);
         }

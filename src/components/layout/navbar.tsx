@@ -69,7 +69,7 @@ function NavItem({ icon: Icon, label, href }: NavItemData) {
 // --- Main Component ---
 export function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userSlug, setUserSlug] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export function Navbar() {
     if (token) {
       const decoded = parseJwt(token); 
       if (decoded) {
-        setUserId(decoded.userId || decoded.sub || decoded.id);
+        setUserSlug(decoded.slug || decoded.sub);
       }
     }
   }, []);
@@ -162,9 +162,9 @@ export function Navbar() {
                     </div>
                   </div>
                   
-                  {/* Link Xem hồ sơ với userId động */}
+                  {/* Link Xem hồ sơ với userSlug động */}
                   <Link 
-                    href={userId ? `/profile/${userId}` : '/login'} 
+                    href={userSlug ? `/profile/${userSlug}` : '/login'} 
                     className="block w-full mb-2 rounded-full border border-blue-600 py-1 text-center text-sm font-semibold text-blue-600 hover:bg-blue-50 hover:border-blue-800 hover:text-blue-800 transition-colors"
                     onClick={() => setIsDropdownOpen(false)}
                   >
