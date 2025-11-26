@@ -14,10 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator"; 
 import { MainFooter } from "@/components/layout/Footer"; 
 import { ProfileHeader } from '@/components/profile/ProfileHeader'
-import { ExperienceSection } from '@/components/profile/ExperienceSection'
+import { ExperienceSection }  from '@/components/profile/ExperienceSection'
 import { EducationSection } from '@/components/profile/EducationSection'
 import { SkillsSection } from '@/components/profile/SkillsSection'
 import EditIntroDialog from '@/components/profile/EditIntroDialog';
+import { storage } from '@/lib/utils/storage';
+import  { parseJwt } from '@/lib/utils/jwt';
 
 import { profileApi } from '@/lib/api/profileApi'; 
 import { ProfileData } from '@/types/profile'; 
@@ -29,6 +31,9 @@ const getYear = (dateString: string | null) => {
 };
 
 export default function ProfilePage() {
+  const token = storage.getToken();
+  const userId = token ? parseJwt(token).userId : null;
+
   const params = useParams();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -125,7 +130,7 @@ export default function ProfilePage() {
         </Card>
 
         <ExperienceSection experiences={profile.experiences} />
-        <EducationSection educations={profile.educations} />
+        <EducationSection educations={profile.educations} userId={userId} />
         <SkillsSection skills={profile.skills} />
 
         <Card className="rounded-xl border border-gray-300 shadow-sm bg-white">

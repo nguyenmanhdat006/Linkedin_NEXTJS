@@ -17,15 +17,16 @@ export interface Experience {
 }
 
 export interface Education {
-  id: number;
+  id?: number;
   school: string;
   degree: string;
   fieldOfStudy: string;
   startDate: string;
-  endDate: string | null;
-  grade: number; // Hoặc string nếu thang điểm phức tạp (ví dụ: "3.5/4.0")
-  activities: string;
-  description: string;
+  endDate: string;
+  grade?: number;
+  activities?: string;
+  description?: string;
+  displayOrder?: number;
 }
 
 export interface Skill {
@@ -34,7 +35,9 @@ export interface Skill {
   category: string;
   endorsementCount: number;
   isEndorsedByCurrentUser: boolean;
+  description?: string; 
 }
+
 
 export interface ProfileData {
   id: number;
