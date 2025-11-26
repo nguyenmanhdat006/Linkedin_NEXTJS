@@ -76,3 +76,13 @@ export interface ProfileResponse {
   data: ProfileData;
   timestamp: string;
 }
+
+export interface UpdateProfileRequest {
+  fullName?: string;
+  headline?: string;
+  about?: string;
+  city?: string;
+  country?: string;
+  website?: string | null;
+  phone?: string | null;
+}
