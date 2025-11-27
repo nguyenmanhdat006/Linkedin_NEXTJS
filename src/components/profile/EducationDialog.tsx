@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Education } from "@/types/profile";
 import { toast } from "react-toastify";
-import { educationApi } from "@/lib/api/educationApi";
+import { useAppDispatch } from "@/lib/store";
+import { createEducation, updateEducation } from "@/lib/store/educationStore";
 
 interface Props {
   open: boolean;
@@ -18,6 +19,8 @@ interface Props {
 }
 
 export default function EducationDialog({ open, onOpenChange, education, userId }: Props) {
+
+  const dispatch = useAppDispatch();
 
   const { register, handleSubmit, reset } = useForm<Education>({
     defaultValues: {
@@ -63,13 +66,13 @@ export default function EducationDialog({ open, onOpenChange, education, userId 
 
   const onSubmit = async (data: Education) => {
     try {
-      const payload = { userId, ...data };
+      const payload = { userId, ...data } as any;
 
       if (education?.id) {
-        await educationApi.updateEducation(education.id, payload);
+        await dispatch(updateEducation({ id: education.id, data: payload })).unwrap();
         toast.success("Cập nhật học vấn thành công!");
       } else {
-        await educationApi.createEducation(payload);
+        await dispatch(createEducation(payload)).unwrap();
         toast.success("Thêm học vấn thành công!");
       }
 

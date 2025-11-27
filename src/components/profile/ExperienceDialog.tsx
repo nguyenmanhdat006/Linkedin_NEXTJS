@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Experience } from "@/types/profile";
 import { toast } from "react-toastify";
-import { experienceApi } from "@/lib/api/experienceApi";
+import { useAppDispatch } from "@/lib/store";
+import { createExperience, updateExperience } from "@/lib/store/experienceStore";
 
 interface Props {
   open: boolean;
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export default function ExperienceDialog({ open, onOpenChange, experience, userId }: Props) {
+  const dispatch = useAppDispatch();
   const { register, handleSubmit, reset } = useForm<Experience>({
     defaultValues: {
       title: "",
@@ -60,12 +62,12 @@ export default function ExperienceDialog({ open, onOpenChange, experience, userI
   const onSubmit = async (data: Experience) => {
     if (!userId) return;
     try {
-      const payload = { userId, ...data };
+      const payload = { userId, ...data } as any;
       if (experience?.id) {
-        await experienceApi.updateExperience(userId, experience.id, payload);
+        await dispatch(updateExperience({ id: experience.id, data: payload })).unwrap();
         toast.success("Cập nhật kinh nghiệm thành công!");
       } else {
-        await experienceApi.createExperience(userId, payload);
+        await dispatch(createExperience(payload)).unwrap();
         toast.success("Thêm kinh nghiệm thành công!");
       }
       onOpenChange(false);
@@ -107,7 +109,19 @@ export default function ExperienceDialog({ open, onOpenChange, experience, userI
 
             <div className="flex flex-col">
               <label className="block text-sm font-medium text-gray-700 mb-1">Loại hình công việc</label>
-              <Input {...register("employmentType")} className="h-10 border border-gray-300 rounded-xl px-3 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Full-time, Part-time..." />
+              <select
+                {...register("employmentType")}
+                className="h-10 border border-gray-300 rounded-xl px-3 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                defaultValue=""
+              >
+                <option value="" disabled>Chọn loại hình công việc</option>
+                <option value="FULL_TIME">Full-time</option>
+                <option value="PART_TIME">Part-time</option>
+                <option value="CONTRACT">Contract</option>
+                <option value="INTERNSHIP">Internship</option>
+                <option value="FREELANCE">Freelance</option>
+                <option value="SELF_EMPLOYED">Self-employed</option>
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

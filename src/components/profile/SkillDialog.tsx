@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Skill } from "@/types/profile";
-import { skillApi } from "@/lib/api/skillApi";
+import { useAppDispatch } from "@/lib/store";
+import { createSkill, updateSkill } from "@/lib/store/skillStore";
 import { toast } from "react-toastify";
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export default function SkillDialog({ open, onOpenChange, skill, userId }: Props) {
+  const dispatch = useAppDispatch();
   const { register, handleSubmit, reset } = useForm<Partial<Skill>>({
     defaultValues: { name: '', category: '', description: '' },
   });
@@ -38,10 +40,10 @@ export default function SkillDialog({ open, onOpenChange, skill, userId }: Props
     if (!userId) return;
     try {
       if (skill?.id) {
-        await skillApi.updateSkill(userId, skill.id, data);
+        await dispatch(updateSkill({ id: skill.id, data: { ...data, userId } })).unwrap();
         toast.success("Cập nhật kỹ năng thành công!");
       } else {
-        await skillApi.createSkill(userId, data);
+        await dispatch(createSkill({ userId, ...data })).unwrap();
         toast.success("Thêm kỹ năng thành công!");
       }
       onOpenChange(false);

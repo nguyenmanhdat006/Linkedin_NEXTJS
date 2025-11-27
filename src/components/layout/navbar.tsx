@@ -75,9 +75,11 @@ export function Navbar() {
   useEffect(() => {
     const token = storage.getToken();
     if (token) {
-      const decoded = parseJwt(token); 
+      const decoded = parseJwt(token);
       if (decoded) {
-        setUserSlug(decoded.slug || decoded.sub);
+        // Use explicit `slug` claim only. Don't fall back to `sub` (numeric id)
+        // because profile route expects a human-readable slug, not the numeric id.
+        if (decoded.slug) setUserSlug(decoded.slug);
       }
     }
   }, []);

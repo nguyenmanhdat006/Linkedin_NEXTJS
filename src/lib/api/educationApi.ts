@@ -1,23 +1,34 @@
 import axiosClient from "@/lib/axiosClient";
+import { Education } from "@/types/profile";
 
 export const educationApi = {
   // GET all education by userId
   getByUserId(userId: number) {
-    return axiosClient.get(`/education/user/${userId}`);
+    return axiosClient.get<{ success: boolean; message: string; data: Education[] }>(
+      `/api/educations/user/${userId}`
+    );
   },
 
   // CREATE new education
-  createEducation(data: any) {
-    return axiosClient.post(`/education`, data);
+  createEducation(data: Education) {
+    return axiosClient.post<{ success: boolean; message: string; data: Education }>(
+      `/api/educations`,
+      data
+    );
   },
 
   // UPDATE education
-  updateEducation(id: number, data: any) {
-    return axiosClient.put(`/education/${id}`, data);
+  updateEducation(id: number, data: Education) {
+    return axiosClient.put<{ success: boolean; message: string; data: Education }>(
+      `/api/educations/${id}`,
+      data
+    );
   },
 
   // DELETE education
   deleteEducation(id: number) {
-    return axiosClient.delete(`/education/${id}`);
+    return axiosClient.delete<{ success: boolean; message: string; data: string }>(
+      `/api/educations/${id}`
+    );
   },
 };
