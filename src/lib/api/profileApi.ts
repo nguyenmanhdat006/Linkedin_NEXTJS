@@ -1,16 +1,14 @@
-// src/api/profileApi.ts
 import axiosClient from "@/lib/axiosClient";
 import { ProfileResponse, UpdateProfileRequest } from "@/types/profile";
 
 export const profileApi = {
   /**
-   * Lấy profile theo userId (slug hoặc id)
    * @param userId 
    * @returns Promise<ProfileResponse>
    */
-  getProfileByUserId: (userId: string | number): Promise<ProfileResponse> => {
+  getProfileBySlug: (userSlug: string | number): Promise<ProfileResponse> => {
     return axiosClient
-      .get<ProfileResponse>(`/api/profile/${userId}`)
+      .get<ProfileResponse>(`/api/profile/${userSlug}`)
       .then((res) => res.data)
       .catch((err) => {
         console.error("❌ Error fetching profile:", err);
@@ -19,7 +17,6 @@ export const profileApi = {
   },
 
   /**
-   * Cập nhật thông tin profile của chính người dùng
    * @param data UpdateProfileRequest
    * @returns Promise<void>
    */
