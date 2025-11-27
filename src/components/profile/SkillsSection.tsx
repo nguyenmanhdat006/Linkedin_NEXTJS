@@ -7,6 +7,8 @@ import { Pencil } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skill } from '@/types/profile';
 import SkillDialog from './SkillDialog';
+import { useAppDispatch } from '@/lib/store';
+import { deleteSkill } from '@/lib/store/skillStore';
 
 interface SkillsSectionProps {
   skills?: Skill[];
@@ -25,6 +27,19 @@ export function SkillsSection({ skills, userId }: SkillsSectionProps) {
   const handleAdd = () => {
     setSelectedSkill(null);
     setOpen(true);
+  };
+
+  const dispatch = useAppDispatch();
+
+  const handleDelete = async (id: number) => {
+    if (!userId) return;
+    if (!confirm('Bạn có chắc muốn xóa kỹ năng này?')) return;
+    try {
+      await dispatch(deleteSkill({ id, userId })).unwrap();
+    } catch (e) {
+      console.error(e);
+      alert('Xóa thất bại');
+    }
   };
 
   return (
@@ -48,14 +63,22 @@ export function SkillsSection({ skills, userId }: SkillsSectionProps) {
           {skills && skills.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (
-                <Badge
-                  key={skill.id}
-                  variant="secondary"
-                  className="px-3 py-1.5 text-sm font-medium border-gray-300 hover:bg-gray-200 cursor-pointer"
-                  onClick={() => handleEdit(skill)} // click từng badge để chỉnh sửa
-                >
-                  {skill.name} ({skill.endorsementCount})
-                </Badge>
+                <div key={skill.id} className="relative inline-flex items-center">
+                  <Badge
+                    variant="secondary"
+                    className="px-3 py-1.5 text-sm font-medium border-gray-300 hover:bg-gray-200 cursor-pointer"
+                    onClick={() => handleEdit(skill)} // click từng badge để chỉnh sửa
+                  >
+                    {skill.name} ({skill.endorsementCount})
+                  </Badge>
+                  <button
+                    aria-label="delete"
+                    onClick={() => handleDelete(skill.id)}
+                    className="ml-1 -ml-2 bg-transparent text-red-600 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </div>
               ))}
             </div>
           ) : (

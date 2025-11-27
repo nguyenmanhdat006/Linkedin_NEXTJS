@@ -1,25 +1,34 @@
-// src/lib/api/skillApi.ts
-import axiosClient from '../axiosClient';
-import { Skill } from '@/types/profile';
+import axiosClient from "@/lib/axiosClient";
+import { Skill } from "@/types/profile";
 
 export const skillApi = {
-  getSkills: async (userId: number) => {
-    const res = await axiosClient.get(`/profiles/${userId}/skills`);
-    return res.data;
+  // GET all skills
+  getSkills() {
+    return axiosClient.get<{ success: boolean; message: string; data: Skill[] }>(
+      `/api/skills`
+    );
   },
 
-  createSkill: async (userId: number, data: Partial<Skill>) => {
-    const res = await axiosClient.post(`/profiles/${userId}/skills`, data);
-    return res.data;
+  // CREATE new skill
+  createSkill(data: Skill) {
+    return axiosClient.post<{ success: boolean; message: string; data: Skill }>(
+      `/api/skills`,
+      data
+    );
   },
 
-  updateSkill: async (userId: number, skillId: number, data: Partial<Skill>) => {
-    const res = await axiosClient.put(`/profiles/${userId}/skills/${skillId}`, data);
-    return res.data;
+  // UPDATE skill
+  updateSkill(id: number, data: Skill) {
+    return axiosClient.put<{ success: boolean; message: string; data: Skill }>(
+      `/api/skills/${id}`,
+      data
+    );
   },
 
-  deleteSkill: async (userId: number, skillId: number) => {
-    const res = await axiosClient.delete(`/profiles/${userId}/skills/${skillId}`);
-    return res.data;
+  // DELETE skill
+  deleteSkill(id: number) {
+    return axiosClient.delete<{ success: boolean; message: string; data: string }>(
+      `/api/skills/${id}`
+    );
   },
 };

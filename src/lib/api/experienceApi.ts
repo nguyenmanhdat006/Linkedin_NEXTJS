@@ -1,24 +1,34 @@
-import axiosClient from '../axiosClient';
-import { Experience } from '@/types/profile';
+import axiosClient from "@/lib/axiosClient";
+import { Experience } from "@/types/profile";
 
 export const experienceApi = {
-  getExperiences: async (userId: number) => {
-    const res = await axiosClient.get(`/profiles/${userId}/experiences`);
-    return res.data;
+  // GET all experiences by userId
+  getByUserId(userId: number) {
+    return axiosClient.get<{ success: boolean; message: string; data: Experience[] }>(
+      `/api/experiences/user/${userId}`
+    );
   },
 
-  createExperience: async (userId: number, data: Partial<Experience>) => {
-    const res = await axiosClient.post(`/profiles/${userId}/experiences`, data);
-    return res.data;
+  // CREATE new experience
+  createExperience(data: Experience) {
+    return axiosClient.post<{ success: boolean; message: string; data: Experience }>(
+      `/api/experiences`,
+      data
+    );
   },
 
-  updateExperience: async (userId: number, experienceId: number, data: Partial<Experience>) => {
-    const res = await axiosClient.put(`/profiles/${userId}/experiences/${experienceId}`, data);
-    return res.data;
+  // UPDATE experience
+  updateExperience(id: number, data: Experience) {
+    return axiosClient.put<{ success: boolean; message: string; data: Experience }>(
+      `/api/experiences/${id}`,
+      data
+    );
   },
 
-  deleteExperience: async (userId: number, experienceId: number) => {
-    const res = await axiosClient.delete(`/profiles/${userId}/experiences/${experienceId}`);
-    return res.data;
+  // DELETE experience
+  deleteExperience(id: number) {
+    return axiosClient.delete<{ success: boolean; message: string; data: string }>(
+      `/api/experiences/${id}`
+    );
   },
 };
