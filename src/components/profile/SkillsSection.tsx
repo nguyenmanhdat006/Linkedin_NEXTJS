@@ -9,6 +9,7 @@ import { Skill } from '@/types/profile';
 import SkillDialog from './SkillDialog';
 import { useAppDispatch } from '@/lib/store';
 import { deleteSkill } from '@/lib/store/skillStore';
+import { toast } from 'react-toastify';
 
 interface SkillsSectionProps {
   skills?: Skill[];
@@ -36,9 +37,10 @@ export function SkillsSection({ skills, userId }: SkillsSectionProps) {
     if (!confirm('Bạn có chắc muốn xóa kỹ năng này?')) return;
     try {
       await dispatch(deleteSkill({ id, userId })).unwrap();
+      toast.success('Xóa kỹ năng thành công');
     } catch (e) {
       console.error(e);
-      alert('Xóa thất bại');
+      toast.error('Xóa thất bại');
     }
   };
 
@@ -61,20 +63,22 @@ export function SkillsSection({ skills, userId }: SkillsSectionProps) {
           </div>
 
           {skills && skills.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {skills.map((skill) => (
-                <div key={skill.id} className="relative inline-flex items-center">
+                <div key={skill.id} className="relative inline-flex items-center space-x-2">
                   <Badge
                     variant="secondary"
-                    className="px-3 py-1.5 text-sm font-medium border-gray-300 hover:bg-gray-200 cursor-pointer"
+                    className="px-4 py-1.5 text-sm font-medium border border-gray-200 bg-gray-50 hover:bg-gray-100 cursor-pointer flex items-center gap-3 rounded-full shadow-sm"
                     onClick={() => handleEdit(skill)} // click từng badge để chỉnh sửa
                   >
-                    {skill.name} ({skill.endorsementCount})
+                    <span className="font-semibold text-gray-800">{skill.name}</span>
+                    <span className="text-xs text-gray-500">{skill.category}</span>
+                    <span className="text-xs text-gray-400">• {skill.endorsementCount ?? 0}</span>
                   </Badge>
                   <button
-                    aria-label="delete"
+                    aria-label={`delete-skill-${skill.id}`}
                     onClick={() => handleDelete(skill.id)}
-                    className="ml-1 -ml-2 bg-transparent text-red-600 hover:text-red-700"
+                    className="ml-2 bg-transparent text-red-600 hover:text-red-700"
                   >
                     ×
                   </button>

@@ -34,7 +34,10 @@ export const createSkill = createAsyncThunk<any, Partial<Skill> & { userId: numb
   async (payload, { dispatch, rejectWithValue }) => {
     try {
       const { userId, ...data } = payload as any;
-      const res = await skillApi.createSkill(data as Skill);
+      // If a userId is provided, use the user-specific endpoint
+      const res = userId
+        ? await skillApi.createSkillForUser(userId, data as Skill)
+        : await skillApi.createSkill(data as Skill);
       if (userId) {
         const token = storage.getToken();
         const decoded = token ? parseJwt(token) : null;

@@ -9,10 +9,32 @@ export const skillApi = {
     );
   },
 
+  // GET skills by userId
+  getSkillsByUser(userId: number) {
+    return axiosClient.get<{ success: boolean; message: string; data: Skill[] }>(
+      `/api/skills/user/${userId}`
+    );
+  },
+
+  // GET single skill by id
+  getSkill(id: number) {
+    return axiosClient.get<{ success: boolean; message: string; data: Skill }>(
+      `/api/skills/${id}`
+    );
+  },
+
   // CREATE new skill
   createSkill(data: Skill) {
     return axiosClient.post<{ success: boolean; message: string; data: Skill }>(
       `/api/skills`,
+      data
+    );
+  },
+
+  // CREATE skill for a specific user
+  createSkillForUser(userId: number, data: Skill) {
+    return axiosClient.post<{ success: boolean; message: string; data: Skill }>(
+      `/api/skills/user/${userId}`,
       data
     );
   },
