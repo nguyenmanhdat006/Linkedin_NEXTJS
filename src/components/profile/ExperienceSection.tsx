@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Briefcase, Pencil } from "lucide-react";
 import { Experience } from "@/types/profile";
 import ExperienceDialog from "./ExperienceDialog";
-import { useAppDispatch } from "@/lib/store";
-import { deleteExperience } from "@/lib/store/experienceStore";
+import { useExperiences } from "@/hooks/useExperiences";
 
 interface ExperienceSectionProps {
   experiences?: Experience[];
@@ -28,13 +27,13 @@ export function ExperienceSection({ experiences, userId }: ExperienceSectionProp
     setOpen(true);
   };
 
-  const dispatch = useAppDispatch();
+  const { deleteExperience } = useExperiences();
 
   const handleDelete = async (id: number) => {
     if (!userId) return;
     if (!confirm("Bạn có chắc muốn xóa kinh nghiệm này?")) return;
     try {
-      await dispatch(deleteExperience({ id, userId })).unwrap();
+      await deleteExperience(id, userId ?? undefined);
     } catch (e) {
       console.error(e);
       alert("Xóa thất bại");

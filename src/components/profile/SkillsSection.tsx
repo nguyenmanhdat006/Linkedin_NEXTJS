@@ -7,9 +7,7 @@ import { Pencil } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skill } from '@/types/profile';
 import SkillDialog from './SkillDialog';
-import { useAppDispatch } from '@/lib/store';
-import { deleteSkill } from '@/lib/store/skillStore';
-import { toast } from 'react-toastify';
+import { useSkills } from '@/hooks/useSkills';
 
 interface SkillsSectionProps {
   skills?: Skill[];
@@ -30,17 +28,15 @@ export function SkillsSection({ skills, userId }: SkillsSectionProps) {
     setOpen(true);
   };
 
-  const dispatch = useAppDispatch();
+  const { deleteSkill } = useSkills();
 
   const handleDelete = async (id: number) => {
     if (!userId) return;
     if (!confirm('Bạn có chắc muốn xóa kỹ năng này?')) return;
     try {
-      await dispatch(deleteSkill({ id, userId })).unwrap();
-      toast.success('Xóa kỹ năng thành công');
+      await deleteSkill(id, userId ?? undefined);
     } catch (e) {
       console.error(e);
-      toast.error('Xóa thất bại');
     }
   };
 

@@ -7,9 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Education } from "@/types/profile";
-import { toast } from "react-toastify";
-import { useAppDispatch } from "@/lib/store";
-import { createEducation, updateEducation } from "@/lib/store/educationStore";
+import { useEducations } from "@/hooks/useEducations";
 
 interface Props {
   open: boolean;
@@ -19,8 +17,7 @@ interface Props {
 }
 
 export default function EducationDialog({ open, onOpenChange, education, userId }: Props) {
-
-  const dispatch = useAppDispatch();
+  const { createEducation, updateEducation } = useEducations();
 
   const { register, handleSubmit, reset } = useForm<Education>({
     defaultValues: {
@@ -69,24 +66,21 @@ export default function EducationDialog({ open, onOpenChange, education, userId 
       const payload = { userId, ...data } as any;
 
       if (education?.id) {
-        await dispatch(updateEducation({ id: education.id, data: payload })).unwrap();
-        toast.success("Cập nhật học vấn thành công!");
+        await updateEducation(education.id, payload);
       } else {
-        await dispatch(createEducation(payload)).unwrap();
-        toast.success("Thêm học vấn thành công!");
+        await createEducation(payload);
       }
 
       onOpenChange(false);
 
     } catch (e) {
       console.error(e);
-      toast.error("Thao tác thất bại");
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] sm:rounded-2xl p-0 bg-white shadow-xl flex flex-col max-h-[80vh]">
+      <DialogContent className="sm:max-w-[520px] sm:rounded-2xl p-0 bg-white shadow-xl flex flex-col max-h-[80vh] overflow-hidden">
 
         {/* Sticky Header */}
         <DialogHeader className="p-6 bg-white sticky top-0 z-10 shadow-sm rounded-t-2xl">
@@ -95,10 +89,10 @@ export default function EducationDialog({ open, onOpenChange, education, userId 
           </DialogTitle>
         </DialogHeader>
 
-        {/* Scrollable form content */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-b-2xl">
-          <form id="edu-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
+        {/* Form wrapping both content and footer */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+          {/* Scrollable form content */}
+          <div className="p-6 overflow-y-auto flex-1 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-b-2xl">
             <div className="flex flex-col">
               <label className="block text-sm font-medium text-gray-700 mb-1">Trường / Học viện</label>
               <Input {...register("school")} className="h-10 border border-gray-300 rounded-xl px-3 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Ví dụ: Đại học Bách Khoa" />
@@ -144,15 +138,14 @@ export default function EducationDialog({ open, onOpenChange, education, userId 
               <label className="block text-sm font-medium text-gray-700 mb-1">Thứ tự hiển thị</label>
               <Input {...register("displayOrder")} type="number" className="h-10 border border-gray-300 rounded-xl px-3 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Ví dụ: 1" />
             </div>
+          </div>
 
-          </form>
-        </div>
-
-        {/* Sticky Footer */}
-        <DialogFooter className="p-4 border-t border-gray-200 bg-white sticky bottom-0 z-10 flex justify-end gap-2 rounded-b-2xl shadow-t">
-          <Button variant="ghost" className="rounded-full" onClick={() => onOpenChange(false)}>Hủy</Button>
-          <Button form="edu-form" type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">Lưu</Button>
-        </DialogFooter>
+          {/* Sticky Footer */}
+          <DialogFooter className="p-4 border-t border-gray-200 bg-white sticky bottom-0 z-10 flex justify-end gap-2 rounded-b-2xl shadow-t">
+            <Button type="button" variant="ghost" className="rounded-full" onClick={() => onOpenChange(false)}>Hủy</Button>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">Lưu</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
