@@ -5,9 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { profileApi } from "@/lib/api/profileApi";
 import { ProfileData } from "@/types/profile";
-import { toast } from "react-toastify";
+import { useProfile } from "@/hooks/useProfile";
 
 interface EditIntroDialogProps {
   open: boolean;
@@ -16,6 +15,7 @@ interface EditIntroDialogProps {
 }
 
 export default function EditIntroDialog({ open, onOpenChange, profileData }: EditIntroDialogProps) {
+  const { updateMyProfile } = useProfile();
   const { register, handleSubmit } = useForm<ProfileData>({
     defaultValues: {
       fullName: profileData?.fullName ?? "",
@@ -30,7 +30,7 @@ export default function EditIntroDialog({ open, onOpenChange, profileData }: Edi
   const onSubmit = async (data: ProfileData) => {
     try {
       const [city, country] = data.location?.split(",").map(s => s.trim()) || ["", ""];
-      await profileApi.updateMyProfile({
+      await updateMyProfile({
         fullName: data.fullName,
         headline: data.headline,
         about: data.about,
@@ -40,10 +40,8 @@ export default function EditIntroDialog({ open, onOpenChange, profileData }: Edi
         phone: data.phone,
       });
       onOpenChange?.(false);
-      toast.success("Cập nhật hồ sơ thành công vui lòng reload trang");
     } catch (err) {
       console.error("Update error", err);
-      toast.error("Cập nhật hồ sơ thất bại");
     }
   };
 

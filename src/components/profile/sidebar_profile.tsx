@@ -1,9 +1,52 @@
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Bookmark } from 'lucide-react'
+import { useEffect, useState } from 'react';
+import { parseJwt } from '@/lib/utils/jwt';
+import { storage } from '@/lib/utils/storage';
+import { profileService } from '@/services/profileService';
+import Link from 'next/link';
 
 export function SidebarProfile() {
+  const [userSlug, setUserSlug] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>('User');
+  const [userHeadline, setUserHeadline] = useState<string>('');
+
+  useEffect(() => {
+    const token = storage.getToken();
+    if (token) {
+      const decoded = parseJwt(token);
+      if (decoded) {
+        if (decoded.slug) {
+          setUserSlug(decoded.slug);
+          
+          // Fetch full profile data
+          profileService.getProfileBySlug(decoded.slug)
+            .then((profile: any) => {
+              if (profile.firstName && profile.lastName) {
+                setUserName(`${profile.firstName} ${profile.lastName}`);
+              }
+              if (profile.headline) {
+                setUserHeadline(profile.headline);
+              }
+            })
+            .catch((err: any) => {
+              console.error('Failed to fetch profile:', err);
+            });
+        }
+        
+        // Temporary name from email
+        if (decoded.sub) {
+          const emailPrefix = decoded.sub.split('@')[0];
+          setUserName(emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
+        }
+      }
+    }
+  }, []);
+
   return (
     <div className="space-y-2">
       <Card className="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl">
@@ -11,14 +54,19 @@ export function SidebarProfile() {
           <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
             <Avatar className="h-16 w-16 border-2 border-white cursor-pointer">
               <AvatarImage src="/placeholder-user.jpg" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>{userName.substring(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
           </div>
         </div>
         <CardContent className="pt-10 pb-4 text-center">
-          <h3 className="font-semibold hover:underline cursor-pointer">Kemal Salih Carfi</h3>
+          <Link 
+            href={userSlug ? `/profile/${userSlug}` : '#'} 
+            className="font-semibold hover:underline cursor-pointer"
+          >
+            {userName}
+          </Link>
           <p className="text-xs text-muted-foreground mt-1">
-            Digital Sahne şirketinde Intern UI/UX Designer
+            {userHeadline || 'Chưa cập nhật thông tin'}
           </p>
         </CardContent>
         <Separator />

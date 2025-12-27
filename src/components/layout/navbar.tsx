@@ -7,6 +7,7 @@ import { Search, Home, Users, Briefcase, MessageSquare, Bell, Grid, ChevronDown 
 
 import { parseJwt } from '@/lib/utils/jwt';
 import { storage } from '@/lib/utils/storage';
+import { profileService } from '@/services/profileService';
 
 const Input = ({ type, placeholder, className = "" }: { type: string, placeholder: string, className?: string }) =>
   <input type={type} placeholder={placeholder} className={className} />;
@@ -70,6 +71,8 @@ function NavItem({ icon: Icon, label, href }: NavItemData) {
 export function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [userSlug, setUserSlug] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>('User');
+  const [userHeadline, setUserHeadline] = useState<string>('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -79,7 +82,34 @@ export function Navbar() {
       if (decoded) {
         // Use explicit `slug` claim only. Don't fall back to `sub` (numeric id)
         // because profile route expects a human-readable slug, not the numeric id.
-        if (decoded.slug) setUserSlug(decoded.slug);
+        if (decoded.slug) {
+          setUserSlug(decoded.slug);
+          
+          // Fetch full profile data
+          profileService.getProfileBySlug(decoded.slug)
+            .then((profile: any) => {
+              if (profile.firstName && profile.lastName) {
+                setUserName(`${profile.firstName} ${profile.lastName}`);
+              }
+              if (profile.headline) {
+                setUserHeadline(profile.headline);
+              }
+            })
+            .catch((err: any) => {
+              console.error('Failed to fetch profile:', err);
+              // Fallback to email prefix
+              if (decoded.sub) {
+                const emailPrefix = decoded.sub.split('@')[0];
+                setUserName(emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
+              }
+            });
+        }
+        
+        // Temporary name from email while profile loads
+        if (decoded.sub) {
+          const emailPrefix = decoded.sub.split('@')[0];
+          setUserName(emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
+        }
       }
     }
   }, []);
@@ -154,12 +184,12 @@ export function Navbar() {
                   <div className="flex gap-3 mb-3">
                     <Avatar className="h-14 w-14 rounded-full overflow-hidden shrink-0">
                       <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>DN</AvatarFallback>
+                      <AvatarFallback>{userName.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col overflow-hidden">
-                      <h3 className="font-bold text-base truncate text-gray-900">Dat Nguyen</h3>
+                      <h3 className="font-bold text-base truncate text-gray-900">{userName}</h3>
                       <p className="text-sm text-gray-500 leading-tight line-clamp-2">
-                        Sinh viên tại Học viện Công nghệ Bưu chính viễn thông
+                        {userHeadline || 'Chưa cập nhật thông tin'}
                       </p>
                     </div>
                   </div>

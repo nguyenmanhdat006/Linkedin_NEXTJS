@@ -2,9 +2,7 @@
 
   import React, { useEffect, useState } from 'react';
   import { useParams } from 'next/navigation';
-  import { useDispatch, useSelector } from 'react-redux';
-  import { RootState, AppDispatch } from '@/lib/store';
-  import { fetchProfile } from '@/lib/store/userStore';
+  import { useProfile } from '@/hooks/useProfile';
 
   import { Pencil, Eye, Users, Search, MoreHorizontal } from 'lucide-react';
   import { Button } from '@/components/ui/button';
@@ -20,17 +18,16 @@
 
   export default function ProfilePage() {
     const params = useParams();
-    const dispatch = useDispatch<AppDispatch>();
-    const { profile, loading, error } = useSelector((state: RootState) => state.user);
+    const { profile, loading, error, fetchProfile } = useProfile();
     const [isEditIntroOpen, setIsEditIntroOpen] = useState(false);
 
     const userSlug = typeof params.userSlug === 'string' ? params.userSlug : '';
 
     useEffect(() => {
       if (userSlug) {
-        dispatch(fetchProfile(userSlug));
+        fetchProfile(userSlug);
       }
-    }, [userSlug, dispatch]);
+    }, [userSlug, fetchProfile]);
 
     if (loading) {
       return <div className="min-h-screen flex items-center justify-center bg-[#f3f2ef]">Đang tải hồ sơ...</div>;

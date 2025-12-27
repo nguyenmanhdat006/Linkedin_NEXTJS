@@ -1,4 +1,5 @@
-// types/profile.ts
+// Profile types matching Spring Boot backend contract
+import { ApiResponse } from './api';
 
 // 1. Định nghĩa các Type cố định (Union Types)
 export type ConnectionStatus = 'PENDING' | 'CONNECTED' | 'NONE' | 'REJECTED';
@@ -73,13 +74,12 @@ export interface ProfileData {
   skills: Skill[];
 }
 
-export interface ProfileResponse {
-  success: boolean;
-  message: string;
-  data: ProfileData;
-  timestamp: string;
-}
+// Backend returns ApiResponse<ProfileData>
+export type ProfileResponse = ApiResponse<ProfileData>;
 
+/**
+ * UpdateProfileRequest - matches backend DTO
+ */
 export interface UpdateProfileRequest {
   fullName?: string;
   headline?: string;

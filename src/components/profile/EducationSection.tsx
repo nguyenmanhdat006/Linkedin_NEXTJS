@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Pencil } from 'lucide-react';
 import { Education } from '@/types/profile';
 import EducationDialog from './EducationDialog';
-import { useAppDispatch } from '@/lib/store';
-import { deleteEducation } from '@/lib/store/educationStore';
+import { useEducations } from '@/hooks/useEducations';
 
 interface EducationSectionProps {
   educations?: Education[];
@@ -28,13 +27,13 @@ export function EducationSection({ educations, userId }: EducationSectionProps) 
     setOpen(true);
   };
 
-  const dispatch = useAppDispatch();
+  const { deleteEducation } = useEducations();
 
   const handleDelete = async (id?: number) => {
     if (!id || !userId) return;
     if (!confirm('Bạn có chắc muốn xóa học vấn này?')) return;
     try {
-      await dispatch(deleteEducation({ id, userId })).unwrap();
+      await deleteEducation(id, userId ?? undefined);
     } catch (e) {
       console.error(e);
       alert('Xóa thất bại');

@@ -7,9 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Experience } from "@/types/profile";
-import { toast } from "react-toastify";
-import { useAppDispatch } from "@/lib/store";
-import { createExperience, updateExperience } from "@/lib/store/experienceStore";
+import { useExperiences } from "@/hooks/useExperiences";
 
 interface Props {
   open: boolean;
@@ -19,7 +17,7 @@ interface Props {
 }
 
 export default function ExperienceDialog({ open, onOpenChange, experience, userId }: Props) {
-  const dispatch = useAppDispatch();
+  const { createExperience, updateExperience } = useExperiences();
   const { register, handleSubmit, reset } = useForm<Experience>({
     defaultValues: {
       title: "",
@@ -64,16 +62,13 @@ export default function ExperienceDialog({ open, onOpenChange, experience, userI
     try {
       const payload = { userId, ...data } as any;
       if (experience?.id) {
-        await dispatch(updateExperience({ id: experience.id, data: payload })).unwrap();
-        toast.success("Cập nhật kinh nghiệm thành công!");
+        await updateExperience(experience.id, payload);
       } else {
-        await dispatch(createExperience(payload)).unwrap();
-        toast.success("Thêm kinh nghiệm thành công!");
+        await createExperience(payload);
       }
       onOpenChange(false);
     } catch (e) {
       console.error(e);
-      toast.error("Thao tác thất bại");
     }
   };
 
@@ -88,10 +83,10 @@ export default function ExperienceDialog({ open, onOpenChange, experience, userI
           </DialogTitle>
         </DialogHeader>
 
-        {/* Scrollable form content */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-b-2xl">
-          <form id="exp-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
+        {/* Form wrapping both content and footer */}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1">
+          {/* Scrollable form content */}
+          <div className="p-6 overflow-y-auto flex-1 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-b-2xl">
             <div className="flex flex-col">
               <label className="block text-sm font-medium text-gray-700 mb-1">Chức danh</label>
               <Input {...register("title")} className="h-10 border border-gray-300 rounded-xl px-3 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Ví dụ: Kỹ sư phần mềm" />
@@ -144,15 +139,14 @@ export default function ExperienceDialog({ open, onOpenChange, experience, userI
               <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
               <Textarea {...register("description")} rows={3} className="resize-none border border-gray-300 rounded-xl px-3 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Thành tích, dự án..." />
             </div>
+          </div>
 
-          </form>
-        </div>
-
-        {/* Sticky Footer */}
-        <DialogFooter className="p-4 border-t border-gray-200 bg-white sticky bottom-0 z-10 flex justify-end gap-2 rounded-b-2xl shadow-t">
-          <Button variant="ghost" className="rounded-full" onClick={() => onOpenChange(false)}>Hủy</Button>
-          <Button form="exp-form" type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">Lưu</Button>
-        </DialogFooter>
+          {/* Sticky Footer */}
+          <DialogFooter className="p-4 border-t border-gray-200 bg-white sticky bottom-0 z-10 flex justify-end gap-2 rounded-b-2xl shadow-t">
+            <Button type="button" variant="ghost" className="rounded-full" onClick={() => onOpenChange(false)}>Hủy</Button>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">Lưu</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

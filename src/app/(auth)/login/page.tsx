@@ -26,19 +26,22 @@ export default function LoginPage() {
         password,
       });
 
-      if (res.data.includes("chưa xác nhận")) {
-        toast.error(res.data);
-      } else {
-        localStorage.setItem("token", res.data);
-        toast.success("Login thành công!");
+      // Backend returns ApiResponse<string> where data is the JWT token
+      const token = res.data.data;
+      
+      if (token) {
+        localStorage.setItem("token", token);
+        toast.success(res.data.message || "Login thành công!");
         setTimeout(() => {
           router.push("/feed");
         }, 1000);
+      } else {
+        toast.error("Invalid response from server");
       }
     } catch (err: any) {
       console.error(err);
       if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data || "Lỗi kết nối server");
+        toast.error(err.response?.data?.message || "Lỗi kết nối server");
       } else {
         toast.error("Lỗi không xác định");
       }
